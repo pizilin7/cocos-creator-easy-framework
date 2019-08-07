@@ -1,4 +1,5 @@
 import RequestMethod = wx.types.RequestMethod;
+import error = cc.error;
 
 class wechat {
 	////////////////////////////
@@ -295,8 +296,17 @@ class wechat {
 	// 奖励广告
 	///////////////////////////
 
-	public showRewardVideoAd() {
-
+	public showRewardVideoAd(success: Function, fail: Function) {
+		this.showRewardVideoSuccess = success;
+		this.showRewardVideoFail = fail;
+		this.createRewardedVideoAd();
+		this.rewardedVideoAd.load().then(() => {
+			this.rewardedVideoAd.show();
+		}).catch((error) => {
+			this.showRewardVideoFail();
+			this.showRewardVideoFail = null;
+			this.showRewardVideoSuccess = null;
+		})
 	}
 	/**
 	 * @description 创建视频广告单例（小游戏端是全局单例）
@@ -316,10 +326,10 @@ class wechat {
 				// 小于 2.1.0 的基础库版本，res 是一个 undefined
 				// 完整观看视频广告
 				if ((res && res.isEnded) || res === undefined) {
-
+					this.showRewardVideoSuccess(true);
 				// 视频广告中途关闭广告
 				} else {
-
+					this.showRewardVideoSuccess(false);
 				}
 			});
 		}

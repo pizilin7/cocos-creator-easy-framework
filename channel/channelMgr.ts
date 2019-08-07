@@ -112,7 +112,7 @@ class channelMgr {
 	 */
 	public showBannerAd() {
 		if (this.isWechatGame()) {
-
+			Wechat.showBannerAd();
 		}
 	}
 
@@ -121,13 +121,15 @@ class channelMgr {
 	 */
 	public hideBannerAd() {
 		if (this.isWechatGame()) {
-
+			Wechat.hideBannerAd();
 		}
 	}
 	////////////////////////////
 	// 奖励广告
 	///////////////////////////
-
+	public showRewardVideoAd(success: Function, fail: Function) {
+		Wechat.showRewardVideoAd(success, fail);
+	}
 	////////////////////////////
 	// 插屏广告
 	///////////////////////////
