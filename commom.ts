@@ -1,19 +1,52 @@
-import {NetworkMgr} from "./network/networkMgr";
-import {ConfigFrameWork} from "../config";
-import {Http} from "./network/http/http";
-import {AudioMgr} from "./audioMgr/audioMgr";
-import {ChannelMgr} from "./channel/channelMgr";
-import {Wechat} from "./channel/wechat/wechat";
-import UserCenter from "../center/usercenter";
+import { AudioMgr } from './audioMgr/audioMgr';
+import { ChannelMgr } from './channel/channelMgr';
+import { Wechat } from './channel/wechat/wechat';
+import { ConfigFrameWork } from './config';
+import { ConfigTableMgr } from './configTable/configTableMgr';
+import { Http } from './network/http/http';
+import { NetworkMgr } from './network/networkMgr';
+import { Notifications } from './notification/notifications';
+import {UserCenter} from "./userCenter/userCenter";
+import {Message} from "./message/message";
 
- export class ControlFrameWork {
-	////////////////////////////
-	// 类成员
-	///////////////////////////
+
+const { ccclass, property } = cc._decorator;
+
+@ccclass
+export default class Commom extends cc.Component {
+	// ///////////////////////////
+	// ///成员变量
+	// /////////////////////////
 
 	////////////////////////////
 	// get、set访问器
 	///////////////////////////
+	public get channelMgr() {
+		return ChannelMgr;
+	}
+
+	public get notifications() {
+		return Notifications;
+	}
+
+	public get audioMgr() {
+		return AudioMgr;
+	}
+
+	public get configTable() {
+		return ConfigTableMgr;
+	}
+
+	public get userCenter() {
+		return UserCenter;
+	}
+
+	public get message() {
+		return Message;
+	}
+	// ///////////////////////////
+	// ///cc.class 生命周期函数
+	// /////////////////////////
 
 	////////////////////////////
 	// 网络模块
@@ -25,7 +58,7 @@ import UserCenter from "../center/usercenter";
 		NetworkMgr.encryptCode = ConfigFrameWork.EncryptCode;
 		NetworkMgr.errorRestartGameCode = ConfigFrameWork.ErrorRestartGameCode;
 		NetworkMgr.errorNetCode = ConfigFrameWork.ErrorNetCode;
-		NetworkMgr.dealHeadListener = (head) => {UserCenter.getInstance().dealHead(head)};
+		NetworkMgr.dealHeadListener = (head) => {UserCenter.dealHead(head); };
 		Http.httpUrl = ConfigFrameWork.HttpUrl;
 	}
 	////////////////////////////
@@ -51,16 +84,10 @@ import UserCenter from "../center/usercenter";
 		return AudioMgr.loadAudioResoucre();
 	}
 	////////////////////////////
-	// 奖励广告
+	// JSON配表管理
 	///////////////////////////
-
-	////////////////////////////
-	// 插屏广告
-	///////////////////////////
-
-	////////////////////////////
-	// 游戏圈
-	///////////////////////////
+	public static initConfigMgr(pathName: string) {
+		ConfigTableMgr.loadConfigTable(pathName);
+	}
 
 }
-

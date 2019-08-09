@@ -1,5 +1,6 @@
-import {Wechat} from "./wechat/wechat";
-export enum CHANNELTYPE  {
+import { Wechat } from './wechat/wechat';
+
+export enum CHANNELTYPE {
 	/** 开发模式 */
 	DEVELOP = 0,
 	/** android平台 */
@@ -13,7 +14,7 @@ export enum CHANNELTYPE  {
 	/** hago小游戏 */
 	HAGO = 5,
 	/** facebook小游戏 */
-	FACEBOOK = 6,
+	FACEBOOK = 6
 }
 
 class channelMgr {
@@ -49,6 +50,10 @@ class channelMgr {
 	public set sharePictureAddress(add: Array<string>) {
 		this._sharePictureAddress = add;
 	}
+
+	public set userInfoButtonData(data: any) {
+		this._userInfoButtonData = data;
+	}
 	////////////////////////////
 	// 登录模块
 	///////////////////////////
@@ -59,17 +64,19 @@ class channelMgr {
 		if (this.isDevelop()) {
 			return this.developLogin();
 		} else if (this.isWechatGame()) {
-			return Wechat.wetchatLogin(this._userInfoButtonData);
+			return Wechat.wetchatLogin();
 		} else {
+
 		}
 	}
+
 	/**
 	 * @description 获取缓存opendid和nickname
 	 */
 	private getDevelopLoginData() {
 		// 没有给一个随机的默认数值，如果内网测试的多，可能会重复
-		let _openid = cc.sys.localStorage.getItem(`uid:`) || Math.floor(Math.random() * 1000000);
-		let _nickname = cc.sys.localStorage.getItem(`nickname:`) || `test_${_openid}`;
+		let _openid = cc.sys.localStorage.getItem('uid:') || Math.floor(Math.random() * 1000000);
+		let _nickname = cc.sys.localStorage.getItem('nickname:') || `test_${_openid}`;
 		return {openid: _openid, nickname: _nickname};
 	}
 
@@ -80,8 +87,9 @@ class channelMgr {
 		let data = this.getDevelopLoginData();
 		return new Promise((resolve, reject) => {
 			resolve(data);
-		})
+		});
 	}
+
 	////////////////////////////
 	// 分享
 	///////////////////////////
@@ -103,6 +111,7 @@ class channelMgr {
 		let query = param.query;
 		Wechat.shareAppMessage(title, imageUrl, query);
 	}
+
 	////////////////////////////
 	// banner广告
 	///////////////////////////
@@ -124,12 +133,14 @@ class channelMgr {
 			Wechat.hideBannerAd();
 		}
 	}
+
 	////////////////////////////
 	// 奖励广告
 	///////////////////////////
 	public showRewardVideoAd(success: Function, fail: Function) {
 		Wechat.showRewardVideoAd(success, fail);
 	}
+
 	////////////////////////////
 	// 插屏广告
 	///////////////////////////
@@ -141,6 +152,7 @@ class channelMgr {
 			Wechat.showInterstitialAd();
 		}
 	}
+
 	////////////////////////////
 	// 游戏圈
 	///////////////////////////
@@ -171,6 +183,7 @@ class channelMgr {
 			Wechat.hideGameClub();
 		}
 	}
+
 	////////////////////////////
 	// 通用
 	///////////////////////////

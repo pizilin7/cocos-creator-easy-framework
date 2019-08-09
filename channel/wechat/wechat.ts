@@ -80,28 +80,29 @@ class wechat {
 		this._userInfoButtonData.y = data.y;
 		this._userInfoButtonData.url = data.url;
 	}
+
 	////////////////////////////
 	// 登录模块
 	///////////////////////////
-	public wetchatLogin(userInfoButtonData: any) {
+	public wetchatLogin() {
 		return new Promise((resolve, reject) => {
 			this.getSystemInfoSync();
 			this.getSetting().then((isUserInfo) => {
 				let data = {
-					code: null,
-					encryptedData: null,
-					iv: null,
-					userInfo: null,
+					wccode: null,
+					wcencrypted: null,
+					wciv: null,
+					// userInfo: null
 				};
 				// 获取玩家数据
 				let getLoginData = () => {
 					this.login().then((code: any) => {
-						data.code = code;
+						data.wccode = code;
 						return this.getUserInfo();
 					}).then((res: any) => {
-						data.encryptedData = res.encryptedData;
-						data.iv = res.iv;
-						data.userInfo = res.userInfo;
+						data.wcencrypted = res.encryptedData;
+						data.wciv = res.iv;
+						// data.userInfo = res.userInfo;
 						resolve(data);
 					});
 				};
@@ -109,17 +110,18 @@ class wechat {
 				// 同意授权
 				if (isUserInfo) {
 					getLoginData();
-				// 授权过期、或者新玩家第一次登录，创建登录按钮
+					// 授权过期、或者新玩家第一次登录，创建登录按钮
 				} else {
-					this.createUserInfoButton(userInfoButtonData).then(() => {
+					this.createUserInfoButton().then(() => {
 						return this.onTapUserInfoButton();
 					}).then(() => {
 						getLoginData();
-					})
+					});
 				}
-			})
+			});
 		});
 	}
+
 	/**
 	 * @description 获取用户的当前设置。返回值中只会出现小程序已经向用户请求过的权限
 	 */
@@ -128,12 +130,12 @@ class wechat {
 			if (wechat.isSupportedAPI(wx.getSetting)) {
 				wx.getSetting({
 					success: (res: { authSetting: wx.types.AuthSetting }) => {
-						resolve(res.authSetting["scope.userInfo"]);
+						resolve(res.authSetting['scope.userInfo']);
 					},
 					fail: () => {
 						reject();
 					}
-				})
+				});
 			} else {
 				reject();
 			}
@@ -143,17 +145,17 @@ class wechat {
 	/**
 	 * @description 创建用户登录按钮
 	 */
-	private createUserInfoButton(userInfoButtonData: any) {
+	private createUserInfoButton() {
 		return new Promise((resolve, reject) => {
 			if (wechat.isSupportedAPI(wx.createUserInfoButton)) {
-				this.userInfoButton =  wx.createUserInfoButton({
+				this.userInfoButton = wx.createUserInfoButton({
 					type: 'image',
 					image: this._userInfoButtonData.url,
 					style: {
-						left: this.systemInfo.screenWidth * userInfoButtonData.x - userInfoButtonData.width / 2,
-						top: this.systemInfo.screenHeight * userInfoButtonData.y - userInfoButtonData.height / 2,
-						width: userInfoButtonData.width,
-						height: userInfoButtonData.height
+						left: this.systemInfo.screenWidth * this._userInfoButtonData.x - this._userInfoButtonData.width / 2,
+						top: this.systemInfo.screenHeight * this._userInfoButtonData.y - this._userInfoButtonData.height / 2,
+						width: this._userInfoButtonData.width,
+						height: this._userInfoButtonData.height
 					}
 				});
 				resolve();
@@ -177,7 +179,7 @@ class wechat {
 					} else {
 						reject();
 					}
-				})
+				});
 			} else {
 				resolve();
 			}
@@ -186,12 +188,12 @@ class wechat {
 	}
 
 	/**
-	 *@description 登录游戏服务
+	 * @description 登录游戏服务
 	 */
 	private login() {
 		return new Promise((resolve, reject) => {
 			wx.login({
-				success: (res: {code: string}) => {
+				success: (res: { code: string }) => {
 					resolve(res.code);
 				},
 				fail: () => {
@@ -217,6 +219,7 @@ class wechat {
 			});
 		});
 	}
+
 	////////////////////////////
 	// 分享
 	///////////////////////////
@@ -233,6 +236,7 @@ class wechat {
 			query: _query
 		});
 	}
+
 	////////////////////////////
 	// banner广告
 	///////////////////////////
@@ -289,6 +293,7 @@ class wechat {
 		});
 
 	}
+
 	////////////////////////////
 	// 奖励广告
 	///////////////////////////
@@ -303,8 +308,9 @@ class wechat {
 			this.showRewardVideoFail();
 			this.showRewardVideoFail = null;
 			this.showRewardVideoSuccess = null;
-		})
+		});
 	}
+
 	/**
 	 * @description 创建视频广告单例（小游戏端是全局单例）
 	 */
@@ -324,13 +330,14 @@ class wechat {
 				// 完整观看视频广告
 				if ((res && res.isEnded) || res === undefined) {
 					this.showRewardVideoSuccess(true);
-				// 视频广告中途关闭广告
+					// 视频广告中途关闭广告
 				} else {
 					this.showRewardVideoSuccess(false);
 				}
 			});
 		}
 	}
+
 	////////////////////////////
 	// 插屏广告
 	///////////////////////////
@@ -410,6 +417,7 @@ class wechat {
 			this.gameClub.hide();
 		}
 	}
+
 	////////////////////////////
 	// 其他能力
 	///////////////////////////
@@ -430,7 +438,7 @@ class wechat {
 	}
 
 	/**
-	 *@description 监听小游戏隐藏到后台事件。锁屏、按 HOME 键退到桌面、显示在聊天顶部等操作会触发此事件
+	 * @description 监听小游戏隐藏到后台事件。锁屏、按 HOME 键退到桌面、显示在聊天顶部等操作会触发此事件
 	 * @param callbak
 	 */
 	public onHide(callbak) {
@@ -457,6 +465,7 @@ class wechat {
 			this.hideListener();
 		}
 	}
+
 	////////////////////////////
 	// 通用
 	///////////////////////////
@@ -466,6 +475,7 @@ class wechat {
 	private getSystemInfoSync() {
 		this.systemInfo = wx.getSystemInfoSync();
 	}
+
 	/**
 	 * @description 是否支持改API
 	 * @param api

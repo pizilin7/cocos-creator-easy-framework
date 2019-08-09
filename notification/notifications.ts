@@ -1,8 +1,9 @@
 export class notifications {
 	public static readonly _instance: notifications = new notifications();
 	private _eventMap: any = {};
+
 	/**
-	 *@description 事件注册
+	 * @description 事件注册
 	 * @param {string} type
 	 * @param callback
 	 * @param target
@@ -16,8 +17,8 @@ export class notifications {
 			this._eventMap[type] = [];
 		}
 		// 以type为key
-		this._eventMap[type].push({callback: callback, target: target});
-		console.log("============================>注册事件", type)
+		this._eventMap[type].push({callback, target});
+		console.log('============================>注册事件', type);
 	}
 
 	/**
@@ -34,7 +35,7 @@ export class notifications {
 	}
 
 	/**
-	 *@description 派发事件
+	 * @description 派发事件
 	 * @param {string} type
 	 * @param parameters
 	 */
@@ -42,22 +43,22 @@ export class notifications {
 		let eventList = this._eventMap[type];
 		if (!eventList) {
 			// console.error(`派发${type}失败...`);
-			return ;
+			return;
 		}
 		for (let key in eventList) {
 			if (eventList.hasOwnProperty(key)) {
 				let element = eventList[key];
 				if (element && element.target) {
 					element.callback.call(element.target, ...parameters);
-					console.log("============================>派发事件：" + type + ",parameters:" + parameters);
+					console.log('============================>派发事件：' + type + ',parameters:' + parameters);
 				}
 			}
 		}
 	}
 
 	/**
-	 *@description 注销事件
-	 * @param {string} type
+	 * @description 注销事件
+	 * @param type
 	 * @param target
 	 */
 	public off(type: string, target: Object) {
@@ -69,7 +70,7 @@ export class notifications {
 				if (element && element.target === target) {
 					eventList[key] = null;
 					eventList.splice(Number(key), 1);
-					console.log("============================>注销事件：" + type);
+					console.log('============================>注销事件：' + type);
 				}
 			}
 		}
@@ -86,8 +87,8 @@ export class notifications {
 		for (let type in this._eventMap) {
 			if (this._eventMap.hasOwnProperty(type)) {
 				let eventList: Array<any> = this._eventMap[type];
-				for (let index = 0; index < eventList.length; index ++) {
-					let obj: {callback: Function, target: Object} = eventList[index];
+				for (let index = 0; index < eventList.length; index++) {
+					let obj: { callback: Function; target: Object } = eventList[index];
 					// 找到对象
 					if (obj && obj.target && obj.target === target) {
 						eventList.splice(index, 1);
@@ -95,7 +96,7 @@ export class notifications {
 				}
 			}
 			if (this._eventMap.hasOwnProperty(type) && this._eventMap[type].length === 0) {
-				delete  this._eventMap[type];
+				delete this._eventMap[type];
 			}
 		}
 	}

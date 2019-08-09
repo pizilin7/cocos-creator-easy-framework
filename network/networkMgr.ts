@@ -1,6 +1,6 @@
-import {Http} from "./http/http";
 import Sha1 = require('./encrypt/sha1.js');
-import UserCenter from "../../center/usercenter";
+import { Http } from './http/http';
+
 class networkMgr {
 	////////////////////////////
 	// 类成员
@@ -8,15 +8,15 @@ class networkMgr {
 	public static readonly _instance = new networkMgr();
 	/** 消息ID */
 	private mid = 0;
-	/** 消息队列*/
+	/** 消息队列 */
 	private messageList = {};
-	/** 每条消息最多的发送次数*/
+	/** 每条消息最多的发送次数 */
 	private limitMessageNum = 5;
-	/** 时间*/
+	/** 时间 */
 	private timer = null;
-	/** token*/
+	/** token */
 	private token = '';
-	/** 消息锁: false, 可以正常发送消息，已上锁*/
+	/** 消息锁: false, 可以正常发送消息，已上锁 */
 	private isLock = false;
 	private _dealHeadListener: Function = null;
 	/** 加密规则 */
@@ -33,10 +33,10 @@ class networkMgr {
 	private _errorRestartGameCode = [102];
 	/** 错误码列表 */
 	private _errorNetCode = {};
-	/** 超过时间*/
+	/** 超过时间 */
 	private _overTime = 5000;
-	/** 地址 */
-	private _httpUrl: string = null;
+	/** uid */
+	private _uid = 0;
 	////////////////////////////
 	// get、set构造器
 	///////////////////////////
@@ -75,10 +75,14 @@ class networkMgr {
 	public set dealHeadListener(cb: Function) {
 		this._dealHeadListener = cb;
 	}
+
+	public set uid(uid: number) {
+		this._uid = uid;
+	}
 	////////////////////////////
 	// 接口
 	///////////////////////////
-	constructor() {
+	public constructor() {
 		this.mid = 0;
 		this.messageList = {};
 		this.timer = null;
@@ -96,7 +100,7 @@ class networkMgr {
 			head: {
 				route: _route,
 				mid: this.mid.toString(),
-				uid: UserCenter.getInstance().uid
+				uid: this._uid
 			},
 			body: data
 		};
@@ -115,15 +119,16 @@ class networkMgr {
 			this.sendMessage(this.mid);
 		}
 	}
+
 	/**
 	 * @description 检查回包
-	 * @param {any} _respone
+	 * @param _respone
 	 */
 	public checkRespone(_respone: any) {
 		// 解密
-		let respone = this.jsdecrypt(_respone);
-		let head = respone.head;
-		let body = respone.body;
+		let respone: any = this.jsdecrypt(_respone);
+		let head: any = respone.head;
+		let body: any = respone.body;
 		let code = head.code || 0;
 		let mid = head.mid;
 		// 刷新token
@@ -183,7 +188,7 @@ class networkMgr {
 	}
 
 	private checkNextMessage() {
-		for(let key in this.messageList) {
+		for (let key in this.messageList) {
 			let message = this.messageList[key];
 			if (message.sendNum === 0) {
 				this.sendMessage(message.mid);
@@ -204,7 +209,6 @@ class networkMgr {
 	/**
 	 * @description 数据加密（需要和服务端约定）
 	 * @param data
-	 * @returns {any}
 	 */
 	private jsencrypt(data: any) {
 		let head = data.head;
@@ -217,10 +221,9 @@ class networkMgr {
 	/**
 	 * @description 解密
 	 * @param _data
-	 * @returns {any}
 	 */
 	private jsdecrypt(_data) {
-		let data = JSON.parse(_data);
+		let data: string = JSON.parse(_data);
 		return data;
 	}
 
@@ -243,7 +246,7 @@ class networkMgr {
 		message.sendNum += 1;
 		let data = message.data;
 		let route = data.head.route;
-		data.head['token'] = this.token;
+		data.head.token = this.token;
 		// 加密
 		Http.post(route, this.jsencrypt(data));
 	}

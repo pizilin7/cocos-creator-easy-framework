@@ -1,9 +1,9 @@
-import {NetworkMgr} from "../networkMgr";
+import { NetworkMgr } from "../networkMgr";
 
 class http {
-    ////////////////////////////
-    // 类成员
-    ///////////////////////////
+	////////////////////////////
+	// 类成员
+	///////////////////////////
 	public static readonly _instance = new http();
 	private _timeOut = 10 * 1000;
 	private _httpUrl = '';
@@ -18,25 +18,26 @@ class http {
 		this._httpUrl = url;
 	}
 
-    ////////////////////////////
-    // 构造函数
-    ///////////////////////////
+	////////////////////////////
+	// 构造函数
+	///////////////////////////
 	constructor() {
 	}
 
 	public init(httpUrl: string) {
 		this._httpUrl = httpUrl;
 	}
-    ////////////////////////////
-    // 业务逻辑
-    ///////////////////////////
+
+	////////////////////////////
+	// 业务逻辑
+	///////////////////////////
 	public post(route: string, msg: Object) {
 		let xhr = new XMLHttpRequest();
 		// 超时时间1s，单位是毫秒
 		xhr.timeout = this._timeOut;
 		xhr.open('POST', this._httpUrl, true);
 		// 服务端也需要设置
-		xhr.setRequestHeader("Content-Type", "application/json;charset=utf-8");
+		xhr.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
 		xhr.send(JSON.stringify(msg));
 
 		xhr.onreadystatechange = function onreadystatechange() {
@@ -60,4 +61,5 @@ class http {
 		};
 	}
 }
+
 export const Http = http._instance;
