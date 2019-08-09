@@ -1,6 +1,3 @@
-import RequestMethod = wx.types.RequestMethod;
-import error = cc.error;
-
 class wechat {
 	////////////////////////////
 	// 类成员

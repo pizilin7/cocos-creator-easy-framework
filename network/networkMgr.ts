@@ -18,6 +18,7 @@ class networkMgr {
 	private token = '';
 	/** 消息锁: false, 可以正常发送消息，已上锁*/
 	private isLock = false;
+	private _dealHeadListener: Function = null;
 	/** 加密规则 */
 	private _encryptRule = ['mid:', 'uid:', 'key:', 'data:'];
 	/** 加密code, 服务端客户端要统一 */
@@ -71,6 +72,9 @@ class networkMgr {
 		this._overTime = time;
 	}
 
+	public set dealHeadListener(cb: Function) {
+		this._dealHeadListener = cb;
+	}
 	////////////////////////////
 	// 接口
 	///////////////////////////
@@ -125,13 +129,19 @@ class networkMgr {
 		// 刷新token
 		this.token = head.token;
 		let message = this.messageList[mid];
+		// 头部回包处理
+		this.succeedResponeHead(head);
 		// 服务端回包，返回需要的数据
 		if (code === this._successCode) {
-			this.succeedRespone(message, body, mid);
+			this.succeedResponeBody(message, body, mid);
 			// 服务端回包中出现错误码
 		} else {
 			this.checkErrorCode(code, mid);
 		}
+	}
+
+	private succeedResponeHead(head: any) {
+		this._dealHeadListener(head);
 	}
 	////////////////////////////
 	// 业务逻辑
@@ -142,7 +152,7 @@ class networkMgr {
 	 * @param body
 	 * @param mid
 	 */
-	private succeedRespone(message: any, body: any, mid: number) {
+	private succeedResponeBody(message: any, body: any, mid: number) {
 		this.isLock = false;
 		this.clearTimer();
 		this.deleteMessageListItem(mid);

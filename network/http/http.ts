@@ -1,5 +1,4 @@
 import {NetworkMgr} from "../networkMgr";
-import gl from "../../../config";
 
 class http {
     ////////////////////////////

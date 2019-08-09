@@ -4,6 +4,7 @@ import {Http} from "./network/http/http";
 import {AudioMgr} from "./audioMgr/audioMgr";
 import {ChannelMgr} from "./channel/channelMgr";
 import {Wechat} from "./channel/wechat/wechat";
+import UserCenter from "../center/usercenter";
 
  export class ControlFrameWork {
 	////////////////////////////
@@ -24,6 +25,7 @@ import {Wechat} from "./channel/wechat/wechat";
 		NetworkMgr.encryptCode = ConfigFrameWork.EncryptCode;
 		NetworkMgr.errorRestartGameCode = ConfigFrameWork.ErrorRestartGameCode;
 		NetworkMgr.errorNetCode = ConfigFrameWork.ErrorNetCode;
+		NetworkMgr.dealHeadListener = (head) => {UserCenter.getInstance().dealHead(head)};
 		Http.httpUrl = ConfigFrameWork.HttpUrl;
 	}
 	////////////////////////////

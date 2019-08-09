@@ -1,7 +1,6 @@
 export class notifications {
 	public static readonly _instance: notifications = new notifications();
-	private _eventMap: any = [];
-
+	private _eventMap: any = {};
 	/**
 	 *@description 事件注册
 	 * @param {string} type
@@ -22,21 +21,34 @@ export class notifications {
 	}
 
 	/**
+	 * @description 注册事件目标的特定事件类型回调，回调会在第一时间被触发后删除自身。
+	 * @param {string} type
+	 * @param {Function} callback
+	 * @param {Object} target
+	 */
+	public once(type: string, callback: Function, target: Object) {
+		this.on(type, (parameters) => {
+			this.off(type, target);
+			callback.call(target, parameters);
+		}, target);
+	}
+
+	/**
 	 *@description 派发事件
 	 * @param {string} type
 	 * @param parameters
 	 */
-	public emit(type: string, parameters?: any) {
-		let array = this._eventMap[type];
-		if (!array) {
-			console.error(`派发${type}失败...`);
+	public emit(type: string, ...parameters: any[]) {
+		let eventList = this._eventMap[type];
+		if (!eventList) {
+			// console.error(`派发${type}失败...`);
 			return ;
 		}
-		for (let key in array) {
-			if (array.hasOwnProperty(key)) {
-				let element = array[key];
-				if (element.target) {
-					element.callback.call(element.target, parameters);
+		for (let key in eventList) {
+			if (eventList.hasOwnProperty(key)) {
+				let element = eventList[key];
+				if (element && element.target) {
+					element.callback.call(element.target, ...parameters);
 					console.log("============================>派发事件：" + type + ",parameters:" + parameters);
 				}
 			}
@@ -49,30 +61,43 @@ export class notifications {
 	 * @param target
 	 */
 	public off(type: string, target: Object) {
-		let array = this._eventMap[type];
-		if (!array) return;
-		for (let key in array) {
-			if (array.hasOwnProperty(key)) {
-				let element = array[key];
+		let eventList: Array<Object> = this._eventMap[type];
+		if (!eventList) return;
+		for (let key in eventList) {
+			if (eventList.hasOwnProperty(key)) {
+				let element: any = eventList[key];
 				if (element && element.target === target) {
-					array[key] = undefined;
+					eventList[key] = null;
+					eventList.splice(Number(key), 1);
 					console.log("============================>注销事件：" + type);
 				}
 			}
 		}
+		if (eventList.length === 0) {
+			delete this._eventMap[type];
+		}
 	}
 
 	/**
-	 * @description 注册事件目标的特定事件类型回调，回调会在第一时间被触发后删除自身。
-	 * @param {string} type
-	 * @param {Function} callback
-	 * @param {Object} target
+	 * @description 注销该对象的所有事件，（不推荐使用，在事件多的情况下O(n^2)是很消耗计算的）
+	 * @param target
 	 */
-	public once(type: string, callback: Function, target: Object) {
-		this.on(type, (parameters) => {
-			this.off(type, target);
-			callback.call(target, parameters);
-		}, target);
+	public offTarget(target: Object) {
+		for (let type in this._eventMap) {
+			if (this._eventMap.hasOwnProperty(type)) {
+				let eventList: Array<any> = this._eventMap[type];
+				for (let index = 0; index < eventList.length; index ++) {
+					let obj: {callback: Function, target: Object} = eventList[index];
+					// 找到对象
+					if (obj && obj.target && obj.target === target) {
+						eventList.splice(index, 1);
+					}
+				}
+			}
+			if (this._eventMap.hasOwnProperty(type) && this._eventMap[type].length === 0) {
+				delete  this._eventMap[type];
+			}
+		}
 	}
 }
 
