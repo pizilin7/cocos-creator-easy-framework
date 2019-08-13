@@ -5,9 +5,6 @@ import { NetworkMgr } from '../network/networkMgr';
 
 export class Message {
 	////////////////////////////
-	// 类成员
-	///////////////////////////
-	////////////////////////////
 	// 接口
 	///////////////////////////
 	/**
@@ -37,6 +34,21 @@ export class Message {
 			shareid: loginData.shareid
 		};
 		NetworkMgr.xhrPost('http.reqWxLogin', data, callback);
+	}
+
+	/**
+	 * @description 头条登录协议
+	 * @param {Object} loginData
+	 * @param {Function} callback
+	 */
+	public static reqTTLogin(loginData: any, callback: Function) {
+		let data = {
+			code: loginData.code,
+			anonymous_code: loginData.anonymousCode,
+			name: loginData.name,
+			photo: loginData.photo
+		};
+		NetworkMgr.xhrPost('http.reqTtLogin', data, callback);
 	}
 }
 

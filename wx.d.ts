@@ -1057,6 +1057,20 @@ declare function requestAnimationFrame(callback: () => void): number;
 
 declare namespace wx {
 	namespace types {
+		type envVersion = 'develop' | 'trial' | 'release';
+		/**
+		 * 打开另一个小程序
+		 */
+		interface MiniProgram {
+			appId: string;
+			path?: string;
+			extraData?: object;
+			envVersion?: envVersion;
+			success?: () => void;
+			fail?: () => void;
+			complete?: () => void;
+		}
+
 		interface Callbacks {
 			success?: () => void;
 			fail?: () => void;
@@ -1809,11 +1823,13 @@ declare namespace wx {
 
 	function offShow(cb: (res: { scene: string; query: any; shareTicket: string }) => void): void;
 
+
 	// --系统信息
 	function getSystemInfo(cb: types.CallbacksWithType<types.SystemInfo>): void;
 
 	function getSystemInfoSync(): types.SystemInfo;
 
+	function navigateToMiniProgram(param: types.MiniProgram);
 	/**
 	 * 监听音频中断结束，在收到 onAudioInterruptionBegin 事件之后，小程序内所有音频会暂停，收到此事件之后才可再次播放成功
 	 */
@@ -2324,7 +2340,7 @@ declare namespace wx {
 	 * 创建游戏圈按钮。游戏圈按钮被点击后会跳转到小游戏的游戏圈。更多关于游戏圈的信息见 游戏圈使用指南
 	 */
 	function createGameClubButton(param: {
-		type: types.ButtonType;
+		type?: types.ButtonType;
 		text?: string;
 		image?: string;
 		style?: types.ButtonStyle;

@@ -1,4 +1,10 @@
-import {CHANNELTYPE} from "./channel/channelMgr";
+import { CHANNELTYPE } from './channel/channelMgr';
+const GameClubIcon = {
+	green: 'green',
+	white: 'white',
+	dark: 'dark',
+	light: 'light'
+};
 
 export const ConfigFrameWork = {
 	// 渠道模块
@@ -6,38 +12,52 @@ export const ConfigFrameWork = {
 	Channel: CHANNELTYPE.WECHAT,
 	/** 微信登录按钮信息 */
 	UserInfoButtonData: {
-		width: 386,
-		height: 121,
+		width: 230,
+		height: 88,
 		x: 0.5,
 		y: 0.7,
 		/** 布置在外网的登录按钮地址 */
-		url: 'https://img.088youxi.com/Pic/bpmxw/btn.png'
+		url: 'https://wxgame.088youxi.com/qstg/res/qstg_loginBtn.png'
 	},
 	/** banner广告id */
-	BannerAdUnitId: '',
+	BannerAdUnitId: 'adunit-860dd1f8b802b855',
 	/** 奖励视频广告id */
-	RewardedVideoAdUnitId: '',
+	RewardedVideoAdUnitId: 'adunit-8860f24049ae69c1',
 	/** 插屏广告id */
-	InterstitialAdUnitId: '',
+	InterstitialAdUnitId: 'adunit-57a7d5e17388d34d',
 	/** banner广告的像素大小 */
 	BannerSize: {
 		width: 600,
-		heigth: 172
+		height: 172
 	},
 	/** 分享图片地址 */
 	SharePictureAddress: [
-
+		'https://img.088youxi.com/Adv/channel/share/qstg/qstg_share_0.jpg',
+		'https://img.088youxi.com/Adv/channel/share/xlgs/qstg_share_1.jpg'
 	],
 	/** 分享图片用语 */
 	ShareWord: [
-
+		'紧急呼救！，我被丧尸包围了！',
+		'无敌是多么的寂寞~~~',
+		'我是枪神，是兄弟就来帮我打僵尸',
+		'对面内个僵尸，浪我只看一眼，就想立刻打死它'
 	],
+	/** 微信游戏圈 */
+	GameClubSize: {
+		icon: GameClubIcon.green, //
+		x: 110,
+		y: 120,
+		width: 40,
+		height: 40
+	},
+	/** 分享需要3s时间 */
+	ShareWaitTime: 3 * 1000,
 	// 声音模块
 	/** 声音资源地址，在resources文件下面 */
-	AudioFilePath: 'textures/sound',
+	AudioFilePath: 'audio',
 	// 网络模块
 	/** 服务器地址 */
-	HttpUrl: 'https://bpmxw.088youxi.com',
+	HttpUrl: 'https://qstg.088youxi.com',
 	/** 加密code: 需要和服务端统一 */
 	EncryptCode: 'mxwj',
 	/** 错误码列表 */
@@ -55,7 +75,7 @@ export const ConfigFrameWork = {
 		105: '签名错误',
 		107: '参数错误',
 		120: '请求body缺少参数',
-		121: '微信登录失败',
+		121: '微信登录失败'
 		/** 业务逻辑error code */
 	},
 	/** 重起游戏的错误码 */

@@ -3,12 +3,11 @@ import { ChannelMgr } from './channel/channelMgr';
 import { Wechat } from './channel/wechat/wechat';
 import { ConfigFrameWork } from './config';
 import { ConfigTableMgr } from './configTable/configTableMgr';
+import { Message } from './message/message';
 import { Http } from './network/http/http';
 import { NetworkMgr } from './network/networkMgr';
 import { Notifications } from './notification/notifications';
-import {UserCenter} from "./userCenter/userCenter";
-import {Message} from "./message/message";
-
+import { UserCenter } from './userCenter/userCenter';
 
 const { ccclass, property } = cc._decorator;
 
@@ -68,12 +67,19 @@ export default class Commom extends cc.Component {
 		ChannelMgr.channel = ConfigFrameWork.Channel;
 		ChannelMgr.sharePictureAddress = ConfigFrameWork.SharePictureAddress;
 		ChannelMgr.shareWord = ConfigFrameWork.ShareWord;
+		ChannelMgr.wxShareWaiteTime = ConfigFrameWork.ShareWaitTime;
 		if (ChannelMgr.isWechatGame()) {
+			ChannelMgr.switchShowAndHide();
 			Wechat.bannerAdUnitId = ConfigFrameWork.BannerAdUnitId;
 			Wechat.rewardedVideoAdUnitId = ConfigFrameWork.RewardedVideoAdUnitId;
 			Wechat.interstitialAdUnitId = ConfigFrameWork.InterstitialAdUnitId;
 			Wechat.userInfoButtonData = ConfigFrameWork.UserInfoButtonData;
 			Wechat.bannerSize = ConfigFrameWork.BannerSize;
+			Wechat.gameClubSize = ConfigFrameWork.GameClubSize;
+			Wechat.closeRewardVideoListener = () => {
+				AudioMgr.resume();
+				console.log('重启音乐');
+			};
 		}
 	}
 	////////////////////////////

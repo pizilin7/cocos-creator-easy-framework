@@ -1,6 +1,14 @@
 /**
  * @description 声音模块
  */
+
+cc.game.on(cc.game.EVENT_HIDE, () => {
+	AudioMgr.pause();
+});
+
+cc.game.on(cc.game.EVENT_SHOW, () => {
+	AudioMgr.resume();
+});
 class audio {
 	////////////////////////////
 	// 类成员
@@ -64,9 +72,9 @@ class audio {
 	 * @param {string} fileName
 	 */
 	public playMusic(fileName: string) {
-		let id = this.play(fileName, true);
-		if (id) {
-			this.musicID = id;
+		let audioClicp = this.isCanPlayAudio(fileName);
+		if (audioClicp) {
+			this.musicID = cc.audioEngine.playMusic(audioClicp, true);
 		}
 	}
 
@@ -75,7 +83,10 @@ class audio {
 	 * @param {string} fileName
 	 */
 	public playEffect(fileName: string) {
-		this.play(fileName, false);
+		let audioClip = this.isCanPlayAudio(fileName);
+		if (audioClip) {
+			cc.audioEngine.playEffect(audioClip, false);
+		}
 	}
 
 	/**
@@ -83,7 +94,8 @@ class audio {
 	 */
 	public pause() {
 		if (this.isOpen) {
-			cc.audioEngine.stop(this.musicID);
+			cc.audioEngine.pauseMusic();
+			cc.audioEngine.pauseAllEffects();
 		}
 	}
 
@@ -91,8 +103,9 @@ class audio {
 	 * @description 重起声音
 	 */
 	public resume() {
+		console.log('this: ', this, ', cc.audioEngine.resumeMusic:', cc.audioEngine.resumeMusic);
 		if (this.isOpen) {
-			cc.audioEngine.resume(this.musicID);
+			cc.audioEngine.resumeMusic();
 		}
 	}
 	////////////////////////////
@@ -101,9 +114,8 @@ class audio {
 	/**
 	 * @description 播放声音
 	 * @param fileName
-	 * @param loop
 	 */
-	private play(fileName: string, loop: boolean) {
+	private isCanPlayAudio(fileName: string) {
 		if (!this._isOpen) {
 			return null;
 		}
@@ -112,8 +124,7 @@ class audio {
 			console.error('sound: fieName is error, please check it');
 			return null;
 		}
-		let volume = 1;
-		return cc.audioEngine.play(file, loop, volume);
+		return file;
 	}
 }
 

@@ -45,6 +45,7 @@ class wechat {
 		width: 0,
 		height: 0
 	};
+	private _closeRewardVideoListener: Function = null;
 	////////////////////////////
 	// get、set访问器
 	///////////////////////////
@@ -81,12 +82,24 @@ class wechat {
 		this._userInfoButtonData.url = data.url;
 	}
 
+	public set closeRewardVideoListener(cb: Function) {
+		this._closeRewardVideoListener = cb;
+	}
+	////////////////////////////
+	// 构造器
+	///////////////////////////
+	protected constructor() {
+		if (window.wx) {
+			this.getSystemInfoSync();
+			this.createRewardedVideoAd();
+		}
+	}
+
 	////////////////////////////
 	// 登录模块
 	///////////////////////////
 	public wetchatLogin() {
 		return new Promise((resolve, reject) => {
-			this.getSystemInfoSync();
 			this.getSetting().then((isUserInfo) => {
 				let data = {
 					wccode: null,
@@ -281,6 +294,8 @@ class wechat {
 				width: bannerSize.width
 			}
 		});
+		console.log('bannerSize: ', bannerSize, ', systemInfo: ', this.systemInfo, ',this.bannerAd.style: ', this.bannerAd.style);
+
 		this.bannerAd.onLoad(() => {
 			console.log('=====> @framework, banner广告加载成功');
 		});
@@ -299,12 +314,16 @@ class wechat {
 	///////////////////////////
 
 	public showRewardVideoAd(success: Function, fail: Function) {
+		if (!this.rewardedVideoAd) {
+			console.log('=====> @framework, 奖励视频对象为不存在');
+			return null;
+		}
 		this.showRewardVideoSuccess = success;
 		this.showRewardVideoFail = fail;
-		this.createRewardedVideoAd();
 		this.rewardedVideoAd.load().then(() => {
 			this.rewardedVideoAd.show();
 		}).catch((error) => {
+			this.closeRewardVideo();
 			this.showRewardVideoFail();
 			this.showRewardVideoFail = null;
 			this.showRewardVideoSuccess = null;
@@ -312,37 +331,45 @@ class wechat {
 	}
 
 	/**
-	 * @description 创建视频广告单例（小游戏端是全局单例）
+	 * @description 创建奖励视频单例（小游戏端是全局单例）
 	 */
 	private createRewardedVideoAd() {
-		if (!this.rewardedVideoAd) {
-			this.rewardedVideoAd = wx.createRewardedVideoAd({
-				adUnitId: this._rewardedVideoAdUnitId
-			});
-			this.rewardedVideoAd.onLoad(() => {
-				console.log('=====> @framework, 奖励广告加载成功');
-			});
-			this.rewardedVideoAd.onError((res) => {
-				console.log('=====> @framework, 奖励广告加载失败：', res);
-			});
-			this.rewardedVideoAd.onClose((res: { isEnded: boolean }) => {
-				// 小于 2.1.0 的基础库版本，res 是一个 undefined
-				// 完整观看视频广告
-				if ((res && res.isEnded) || res === undefined) {
-					this.showRewardVideoSuccess(true);
-					// 视频广告中途关闭广告
-				} else {
-					this.showRewardVideoSuccess(false);
-				}
-			});
+		if (!wx.createRewardedVideoAd) {
+			console.log('=====> @framework,当前微信版本过低，无法使用奖励视频功能，请升级到最新微信版本后重试');
+			return;
 		}
+		this.rewardedVideoAd = wx.createRewardedVideoAd({
+			adUnitId: this._rewardedVideoAdUnitId
+		});
+		this.rewardedVideoAd.onLoad(() => {
+			console.log('=====> @framework, 奖励广告加载成功');
+		});
+		this.rewardedVideoAd.onError((res) => {
+			console.log('=====> @framework, 奖励广告加载失败：', res);
+		});
+		this.rewardedVideoAd.onClose((res: { isEnded: boolean }) => {
+			this.closeRewardVideo();
+			// 小于 2.1.0 的基础库版本，res 是一个 undefined
+			// 完整观看视频广告
+			if ((res && res.isEnded) || res === undefined) {
+				this.showRewardVideoSuccess(true);
+				// 视频广告中途关闭广告
+			} else {
+				this.showRewardVideoSuccess(false);
+			}
+		});
 	}
 
+	private closeRewardVideo() {
+		if (this._closeRewardVideoListener) {
+			this._closeRewardVideoListener();
+		}
+	}
 	////////////////////////////
 	// 插屏广告
 	///////////////////////////
 	public showInterstitialAd() {
-		if (wx.createInterstitialAd) {
+		if (!wx.createInterstitialAd) {
 			console.log('=====> @framework,当前微信版本过低，无法使用插屏广告功能，请升级到最新微信版本后重试');
 			return;
 		}
@@ -350,7 +377,7 @@ class wechat {
 		let createInterstitialAd = () => {
 			if (!this.interstitialAd) {
 				this.interstitialAd = wx.createInterstitialAd({
-					adUnitId: this._interstitialAdUnitId,
+					adUnitId: this._interstitialAdUnitId
 				});
 			}
 		};
@@ -365,7 +392,7 @@ class wechat {
 		});
 
 		this.interstitialAd.onClose(() => {
-			this.interstitialAd.destroy();
+			// this.interstitialAd.destroy();
 			this.interstitialAd = null;
 			createInterstitialAd();
 		});
@@ -377,35 +404,38 @@ class wechat {
 	///////////////////////////
 	/**
 	 * @description 创建微信游戏圈
-	 * @param pos
 	 */
-	public createGameClubButton(pos: cc.Vec2) {
+	public createGameClubButton() {
 		// 微信圈是用户必要的功能，不需求弹出提示
 		if (!wx.createGameClubButton) {
 			console.log('=====> @framework,当前微信版本过低，无法使用游戏圈功能，请升级到最新微信版本后重试');
-			return;
+			return ;
 		}
-		if (!this.gameClub) {
-			this.gameClub = wx.createGameClubButton({
-				type: 'image',
-				icon: this._gameClubSize.icon,
-				style: {
-					left: this._gameClubSize.x,
-					top: this._gameClubSize.y / this.systemInfo.pixelRatio,
-					width: this._gameClubSize.width,
-					height: this._gameClubSize.height
-				}
-			});
-			this.gameClub.hide();
+		if (this.gameClub) {
+			return ;
 		}
+		this.gameClub = wx.createGameClubButton({
+			icon: this._gameClubSize.icon,
+			style: {
+				left: this._gameClubSize.x / this.systemInfo.pixelRatio,
+				top: this._gameClubSize.y / this.systemInfo.pixelRatio,
+				width: this._gameClubSize.width,
+				height: this._gameClubSize.height
+			}
+		});
+		this.gameClub.hide();
+		console.log('gameClub', this.gameClub);
 	}
 
 	/**
 	 * @description 显示微信游戏圈
 	 */
 	public showGameClub() {
+		console.log('显示游戏圈：', this.gameClub);
+		this.createGameClubButton();
 		if (this.gameClub) {
 			this.gameClub.show();
+			console.log('显示游戏圈成功');
 		}
 	}
 
@@ -466,6 +496,32 @@ class wechat {
 		}
 	}
 
+	/**
+	 * @description 打开另一个小程序
+	 * @param _appId
+	 * @param _path
+	 */
+	public navigateToMiniProgram(_appId: string, _path: string) {
+		return new Promise((resolve, reject) => {
+			if (wechat.isSupportedAPI(wx.navigateToMiniProgram)) {
+				wx.navigateToMiniProgram({
+					appId: _appId,
+					path: _path,
+					envVersion: 'release',
+					success: () => {
+						resolve();
+					},
+					fail: () => {
+						reject();
+					},
+					complete: () => {
+					}
+				});
+			} else {
+				reject();
+			}
+		});
+	}
 	////////////////////////////
 	// 通用
 	///////////////////////////
