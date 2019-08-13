@@ -30,8 +30,6 @@ class toutiao {
 	private _bannerAdUnitId = '';
 	/** 奖励视频广告id */
 	private _rewardedVideoAdUnitId = '';
-	/** 插屏广告id */
-	private _interstitialAdUnitId = '';
 	private _closeRewardVideoListener: Function = null;
 
 	////////////////////////////
@@ -45,10 +43,6 @@ class toutiao {
 		this._rewardedVideoAdUnitId = adUnitId;
 	}
 
-	public set interstitialAdUnitId(adUnitId: string) {
-		this._interstitialAdUnitId = adUnitId;
-	}
-
 	public set closeRewardVideoListener(cb: Function) {
 		this._closeRewardVideoListener = cb;
 	}
@@ -57,8 +51,6 @@ class toutiao {
 	///////////////////////////
 	protected constructor() {
 		if (window.tt) {
-			this.getSystemInfoSync();
-			this.createRewardedVideoAd();
 			this.registerRecordScreenEvent();
 		}
 	}
@@ -67,6 +59,7 @@ class toutiao {
 	///////////////////////////
 	public toutiaoLogin() {
 		return new Promise((resolve, reject) => {
+			this.getSystemInfoSync();
 			let loginData = {
 				code: '',
 				anonymousCode: '',
@@ -82,13 +75,13 @@ class toutiao {
 							.then((data: {userInfo: object; rawData: string; signature?: string; encryptedData?: string; iv?: string}) => {
 								loginData.name = data.userInfo.nickName;
 								loginData.photo = data.userInfo.avatarUrl;
-								reject(loginData);
+								resolve(loginData);
 							})
 							.catch(() => {
 								reject(loginData);
 							});
 					} else {
-						reject(loginData);
+						resolve(loginData);
 					}
 				})
 				.catch(() => {
@@ -232,6 +225,7 @@ class toutiao {
 	///////////////////////////
 	public showRewardVideoAd() {
 		return new Promise((resolve, reject) => {
+			this.createRewardedVideoAd();
 			if (!this.rewardedVideoAd) {
 				console.log('=====> @framework, 奖励视频对象为不存在');
 				reject();
@@ -277,6 +271,9 @@ class toutiao {
 	private createRewardedVideoAd() {
 		if (!wx.createRewardedVideoAd) {
 			console.log('=====> @framework, 当前客户端版本过低，无法使用奖励视频功能，请升级到最新客户端版本后重试');
+			return;
+		}
+		if (this.rewardedVideoAd) {
 			return;
 		}
 		this.rewardedVideoAd = wx.createRewardedVideoAd({

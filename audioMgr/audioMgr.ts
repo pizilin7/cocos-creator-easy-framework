@@ -103,7 +103,6 @@ class audio {
 	 * @description 重起声音
 	 */
 	public resume() {
-		console.log('this: ', this, ', cc.audioEngine.resumeMusic:', cc.audioEngine.resumeMusic);
 		if (this.isOpen) {
 			cc.audioEngine.resumeMusic();
 		}

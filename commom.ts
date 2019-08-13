@@ -1,5 +1,6 @@
 import { AudioMgr } from './audioMgr/audioMgr';
 import { ChannelMgr } from './channel/channelMgr';
+import { Toutiao } from './channel/toutiao/toutiao';
 import { Wechat } from './channel/wechat/wechat';
 import { ConfigFrameWork } from './config';
 import { ConfigTableMgr } from './configTable/configTableMgr';
@@ -78,7 +79,12 @@ export default class Commom extends cc.Component {
 			Wechat.gameClubSize = ConfigFrameWork.GameClubSize;
 			Wechat.closeRewardVideoListener = () => {
 				AudioMgr.resume();
-				console.log('重启音乐');
+			};
+		} else if (ChannelMgr.isTouTiao()) {
+			Toutiao.bannerAdUnitId = ConfigFrameWork.BannerAdUnitId;
+			Toutiao.rewardedVideoAdUnitId = ConfigFrameWork.RewardedVideoAdUnitId;
+			Toutiao.closeRewardVideoListener = () => {
+				AudioMgr.resume();
 			};
 		}
 	}

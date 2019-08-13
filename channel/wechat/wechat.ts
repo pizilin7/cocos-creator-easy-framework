@@ -14,8 +14,6 @@ class wechat {
 	/** 插屏广告对象 */
 	private interstitialAd = null;
 	private gameClub: GameClubButton = null;
-	private showRewardVideoSuccess: Function = null;
-	private showRewardVideoFail: Function = null;
 	private showListener: Function = null;
 	private hideListener: Function = null;
 	/** banner广告id */
@@ -85,21 +83,13 @@ class wechat {
 	public set closeRewardVideoListener(cb: Function) {
 		this._closeRewardVideoListener = cb;
 	}
-	////////////////////////////
-	// 构造器
-	///////////////////////////
-	protected constructor() {
-		if (window.wx) {
-			this.getSystemInfoSync();
-			this.createRewardedVideoAd();
-		}
-	}
 
 	////////////////////////////
 	// 登录模块
 	///////////////////////////
 	public wetchatLogin() {
 		return new Promise((resolve, reject) => {
+			this.getSystemInfoSync();
 			this.getSetting().then((isUserInfo) => {
 				let data = {
 					wccode: null,
@@ -313,20 +303,48 @@ class wechat {
 	// 奖励广告
 	///////////////////////////
 
-	public showRewardVideoAd(success: Function, fail: Function) {
-		if (!this.rewardedVideoAd) {
-			console.log('=====> @framework, 奖励视频对象为不存在');
-			return null;
-		}
-		this.showRewardVideoSuccess = success;
-		this.showRewardVideoFail = fail;
-		this.rewardedVideoAd.load().then(() => {
-			this.rewardedVideoAd.show();
-		}).catch((error) => {
-			this.closeRewardVideo();
-			this.showRewardVideoFail();
-			this.showRewardVideoFail = null;
-			this.showRewardVideoSuccess = null;
+	public showRewardVideoAd() {
+		return new Promise((resolve, reject) => {
+			this.createRewardedVideoAd();
+			if (!this.rewardedVideoAd) {
+				console.log('=====> @framework, 奖励视频对象为不存在');
+				reject();
+				return null;
+			}
+			this.rewardedVideoAd.load().then(() => {
+				this.rewardedVideoAd.show();
+			});
+			let closeListener = (res: {isEnded: boolean}) => {
+				let isComplete: boolean;
+				// 小于 2.1.0 的基础库版本，res 是一个 undefined
+				if (res && res.isEnded || res === undefined) {
+					isComplete = true;
+					resolve(isComplete);
+				} else {
+					isComplete = false;
+					resolve(isComplete);
+				}
+				this.closeRewardVideo();
+				this.rewardedVideoAd.offClose(closeListener);
+			};
+
+			let errorListener = (res: {errMsg: string; errCode: number}) => {
+				console.log('=====> @framework, 奖励视频发生错误：', res);
+				// 再拉一次视频
+				this.rewardedVideoAd.load()
+					.then(() => {
+						return this.rewardedVideoAd.show();
+					})
+					.then(() => {
+						this.rewardedVideoAd.offError(errorListener);
+					})
+					.catch(() => {
+						reject();
+						this.rewardedVideoAd.offError(errorListener);
+					});
+			};
+			this.rewardedVideoAd.onClose(closeListener);
+			this.rewardedVideoAd.onError(errorListener);
 		});
 	}
 
@@ -338,25 +356,15 @@ class wechat {
 			console.log('=====> @framework,当前微信版本过低，无法使用奖励视频功能，请升级到最新微信版本后重试');
 			return;
 		}
+		if (this.rewardedVideoAd) {
+			return;
+		}
 		this.rewardedVideoAd = wx.createRewardedVideoAd({
 			adUnitId: this._rewardedVideoAdUnitId
 		});
+
 		this.rewardedVideoAd.onLoad(() => {
-			console.log('=====> @framework, 奖励广告加载成功');
-		});
-		this.rewardedVideoAd.onError((res) => {
-			console.log('=====> @framework, 奖励广告加载失败：', res);
-		});
-		this.rewardedVideoAd.onClose((res: { isEnded: boolean }) => {
-			this.closeRewardVideo();
-			// 小于 2.1.0 的基础库版本，res 是一个 undefined
-			// 完整观看视频广告
-			if ((res && res.isEnded) || res === undefined) {
-				this.showRewardVideoSuccess(true);
-				// 视频广告中途关闭广告
-			} else {
-				this.showRewardVideoSuccess(false);
-			}
+			console.log('=====> @framework, 加载视频广告成功');
 		});
 	}
 

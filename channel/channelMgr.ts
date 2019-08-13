@@ -106,7 +106,7 @@ class channelMgr {
 	 * @param param
 	 * @param callback callback(bool)中bool为true则是分享3s成功，bool为false则是分享失败
 	 */
-	public share(param: any, callback?: Function) {
+	public shareAppMessage(param: any, callback?: Function) {
 		let title = param.title || this._shareWord[Math.floor(Math.random() * this._shareWord.length)];
 		let imageUrl = param.imageUrl || this._sharePictureAddress[Math.floor(Math.random() * this._sharePictureAddress.length)];
 		let query = param.query;
@@ -114,6 +114,8 @@ class channelMgr {
 			this.shareOfWechat(title, imageUrl, query, callback);
 		} else if (this.isTouTiao()) {
 			this.shareOfToutiao(title, imageUrl, query, callback);
+		} else if (this.isDevelop()) {
+			this.shareOfDevelop(callback);
 		}
 	}
 
@@ -162,6 +164,15 @@ class channelMgr {
 				callback(isShare);
 			});
 	}
+
+	/**
+	 * @description 开发平台下，默认分享
+	 * @param callback
+	 */
+	private shareOfDevelop(callback: Function) {
+		let isShare = true;
+		callback(isShare);
+	}
 	////////////////////////////
 	// banner广告
 	///////////////////////////
@@ -191,10 +202,10 @@ class channelMgr {
 	////////////////////////////
 	// 奖励广告
 	///////////////////////////
-	public showRewardVideoAd(success: Function, fail: Function) {
+	public showRewardVideoAd() {
 		AudioMgr.pause();
 		if (this.isWechatGame()) {
-			Wechat.showRewardVideoAd(success, fail);
+			return Wechat.showRewardVideoAd();
 		} else if (this.isTouTiao()) {
 
 		} else {
@@ -205,7 +216,8 @@ class channelMgr {
 	private showRewardVideoAdOfDevelp() {
 		return new Promise((resolve, reject) => {
 			AudioMgr.resume();
-			resolve();
+			let isComplete = true;
+			resolve(isComplete);
 		});
 	}
 	////////////////////////////

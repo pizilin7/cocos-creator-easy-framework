@@ -9,7 +9,9 @@ const GameClubIcon = {
 export const ConfigFrameWork = {
 	// 渠道模块
 	/** 渠道类型 */
-	Channel: CHANNELTYPE.WECHAT,
+	Channel: CHANNELTYPE.TOUTIAO,
+	/** 是否开启日志 */
+	IsOpenLog: false,
 	/** 微信登录按钮信息 */
 	UserInfoButtonData: {
 		width: 230,
@@ -20,9 +22,11 @@ export const ConfigFrameWork = {
 		url: 'https://wxgame.088youxi.com/qstg/res/qstg_loginBtn.png'
 	},
 	/** banner广告id */
-	BannerAdUnitId: 'adunit-860dd1f8b802b855',
+	// BannerAdUnitId: 'adunit-860dd1f8b802b855', // 微信
+	BannerAdUnitId: '3sepk1sscm9254p162',
 	/** 奖励视频广告id */
-	RewardedVideoAdUnitId: 'adunit-8860f24049ae69c1',
+	// RewardedVideoAdUnitId: 'adunit-8860f24049ae69c1', // 微信
+	RewardedVideoAdUnitId: '1ng95d1gksd5g013l4',
 	/** 插屏广告id */
 	InterstitialAdUnitId: 'adunit-57a7d5e17388d34d',
 	/** banner广告的像素大小 */
@@ -57,7 +61,7 @@ export const ConfigFrameWork = {
 	AudioFilePath: 'audio',
 	// 网络模块
 	/** 服务器地址 */
-	HttpUrl: 'https://qstg.088youxi.com',
+	HttpUrl: 'https://qstg-tt.088youxi.com',
 	/** 加密code: 需要和服务端统一 */
 	EncryptCode: 'mxwj',
 	/** 错误码列表 */
@@ -82,3 +86,10 @@ export const ConfigFrameWork = {
 	ErrorRestartGameCode: [102]
 };
 
+if (!ConfigFrameWork.IsOpenLog) {
+	console.log = function log() {};
+	console.table = function table() {};
+	console.error = function error() {};
+	cc.log = function log() {};
+	cc.error = function error() {};
+}
