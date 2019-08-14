@@ -11,7 +11,7 @@ export const ConfigFrameWork = {
 	/** 渠道类型 */
 	Channel: CHANNELTYPE.TOUTIAO,
 	/** 是否开启日志 */
-	IsOpenLog: false,
+	IsOpenLog: true,
 	/** 微信登录按钮信息 */
 	UserInfoButtonData: {
 		width: 230,

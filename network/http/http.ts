@@ -1,4 +1,4 @@
-import { NetworkMgr } from "../networkMgr";
+import { NetworkMgr } from '../networkMgr';
 
 class http {
 	////////////////////////////
@@ -21,7 +21,7 @@ class http {
 	////////////////////////////
 	// 构造函数
 	///////////////////////////
-	constructor() {
+	public constructor() {
 	}
 
 	public init(httpUrl: string) {

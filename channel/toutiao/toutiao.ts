@@ -138,7 +138,10 @@ class toutiao {
 	 * @description 显示banner广告
 	 */
 	public showBannerAd() {
-		if (!toutiao.isSupportedAPI(tt.createBannerAd)) return;
+		if (!toutiao.isSupportedAPI(tt.createBannerAd)) {
+			console.log('不支持banner广告');
+			return;
+		}
 		this.hideBannerAd();
 		this.createBannerAd();
 		this.bannerAd.onLoad(() => {
@@ -172,9 +175,10 @@ class toutiao {
 			// 广告单元 id
 			adUnitId: this._bannerAdUnitId,
 			style: {
-				width: targetBannerAdWidth,
 				// 根据系统约定尺寸计算出广告高度
-				top: this.systemInfo.windowHeight - (targetBannerAdWidth / 16 * 9)
+				top: this.systemInfo.windowHeight - (targetBannerAdWidth / 16 * 9),
+				left: (this.systemInfo.windowWidth - targetBannerAdWidth) / 2,
+				width: targetBannerAdWidth
 			}
 		});
 
@@ -185,41 +189,11 @@ class toutiao {
 			if (targetBannerAdWidth !== res.width) {
 				this.bannerAd.style.top = this.systemInfo.windowHeight - (res.width / 16 * 9);
 				this.bannerAd.style.left = (this.systemInfo.windowWidth - res.width) / 2;
+				this.bannerAd.style.width = res.width;
 			}
 		});
 	}
-	////////////////////////////
-	// 分享
-	///////////////////////////
-	/**
-	 * @description 主动拉起转发界面
-	 * @param _title 转发标题，不传则默认使用当前小游戏的名称。
-	 * @param _imageUrl 转发显示图片的链接，可以是网络图片路径或本地图片文件路径或相对代码包根目录的图片文件路径，显示图片长宽比推荐 5:4
-	 * @param _query 查询字符串，必须是 key1=val1&key2=val2 的格式。从这条转发消息进入后，可通过 tt.getLaunchOptionSync() 或 tt.onShow() 获取启动参数中的 query。
-	 */
-	public shareAppMessage(_title: string, _imageUrl: string, _query?: string) {
-		return new Promise((resolve, reject) => {
-			tt.shareAppMessage({
-				// article	发布图文内容
-				// video	发布视频内容
-				// token	口令分享，生成一串特定的字符串文本，仅头条APP支持
-				channel: 'article', //
-				title: _title,
-				imageUrl: _imageUrl,
-				query: _query,
-				/** 附加信息 */
-				extra: null,
-				success: () => {
-					resolve();
-					console.log('分享视频成功');
-				},
-				fail: () => {
-					reject();
-					console.log('分享视频失败');
-				}
-			});
-		});
-	}
+
 	////////////////////////////
 	// 奖励广告
 	///////////////////////////
@@ -273,12 +247,14 @@ class toutiao {
 			console.log('=====> @framework, 当前客户端版本过低，无法使用奖励视频功能，请升级到最新客户端版本后重试');
 			return;
 		}
+		console.log('3333333333');
 		if (this.rewardedVideoAd) {
 			return;
 		}
 		this.rewardedVideoAd = wx.createRewardedVideoAd({
 			adUnitId: this._rewardedVideoAdUnitId
 		});
+		console.log('创建成功');
 	}
 
 	private closeRewardVideo() {
@@ -287,13 +263,70 @@ class toutiao {
 		}
 	}
 	////////////////////////////
+	// 分享
+	///////////////////////////
+	/**
+	 * @description 主动拉起转发界面
+	 * @param _title 转发标题，不传则默认使用当前小游戏的名称。
+	 * @param _imageUrl 转发显示图片的链接，可以是网络图片路径或本地图片文件路径或相对代码包根目录的图片文件路径，显示图片长宽比推荐 5:4
+	 * @param _query 查询字符串，必须是 key1=val1&key2=val2 的格式。从这条转发消息进入后，可通过 tt.getLaunchOptionSync() 或 tt.onShow() 获取启动参数中的 query。
+	 */
+	public shareAppMessage(_title: string, _imageUrl: string, _query?: string) {
+		return new Promise((resolve, reject) => {
+			tt.shareAppMessage({
+				// article	发布图文内容
+				// video	发布视频内容
+				// token	口令分享，生成一串特定的字符串文本，仅头条APP支持
+				channel: 'article', //
+				title: _title,
+				imageUrl: _imageUrl,
+				query: _query,
+				/** 附加信息 */
+				extra: null,
+				success: () => {
+					resolve();
+					console.log('分享视频成功');
+				},
+				fail: () => {
+					reject();
+					console.log('分享视频失败');
+				}
+			});
+		});
+	}
+
+	////////////////////////////
 	// 视频录制
 	///////////////////////////
+	/**
+	 * @description 主动拉起发布视频界面
+	 * @param _videoPath 要转发的视频地址
+	 * @param _query 查询字符串，必须是 key1=val1&key2=val2 的格式。从这条转发消息进入后，可通过 tt.getLaunchOptionSync() 或 tt.onShow() 获取启动参数中的 query。分享挑战视频时有效
+	 * @param _title 要转发的视频描述，分享挑战视频时有效
+	 * @param _extra 创建挑战视频时必填的配置
+	 */
+	public shareVideo(_videoPath: string, _query?: string, _title?: string, _extra?: object){
+		return new Promise((resolve, reject) => {
+			tt.shareVideo({
+				videoPath: _videoPath,
+				query: _query,
+				title: _title,
+				extra: _extra,
+				success: () => {
+					resolve();
+				},
+				fail: (res: any) => {
+					console.log('分享视频失败：', res);
+					reject();
+				}
+			});
+		});
+	}
 	/**
 	 * @description 注册GameRecorderManager
 	 */
 	private registerRecordScreenEvent() {
-		if (!tt.getGameRecorderManager) {
+		if (!toutiao.isSupportedAPI(tt.getGameRecorderManager)) {
 			console.log('=====> @framework,当前客户端版过低，无法使用奖励视频功能，请升级到最新客户端版本后重试');
 			return;
 		}
@@ -319,6 +352,7 @@ class toutiao {
 		// 监听录屏结束事件。可以通过 onStop 接口监听录屏结束事件，获得录屏地址
 		this.GameRecorderManager.onStop((res: {videoPath: string}) => {
 			if (this.stopListener) {
+				console.log('视频地址：', res.videoPath);
 				this.stopListener(res.videoPath);
 			}
 		});

@@ -204,13 +204,16 @@ class channelMgr {
 	///////////////////////////
 	public showRewardVideoAd() {
 		AudioMgr.pause();
+		console.log(this.isTouTiao(), this.isWechatGame());
 		if (this.isWechatGame()) {
 			return Wechat.showRewardVideoAd();
 		} else if (this.isTouTiao()) {
-
+			console.log('头条视频');
+			return Toutiao.showRewardVideoAd();
 		} else {
 			return this.showRewardVideoAdOfDevelp();
 		}
+		console.log('观看视频');
 	}
 
 	private showRewardVideoAdOfDevelp() {
@@ -288,6 +291,23 @@ class channelMgr {
 	public recordScreenStop(callback?: Function) {
 		if (this.isTouTiao()) {
 			Toutiao.recordScreenStop(callback);
+		}
+	}
+
+	/**
+	 * @description 主动拉起发布视频界面
+	 * @param _videoPath 要转发的视频地址
+	 * @param _query 查询字符串，必须是 key1=val1&key2=val2 的格式。从这条转发消息进入后，可通过 tt.getLaunchOptionSync() 或 tt.onShow() 获取启动参数中的 query。分享挑战视频时有效
+	 * @param _title 要转发的视频描述，分享挑战视频时有效
+	 * @param _extra 创建挑战视频时必填的配置
+	 */
+	public shareVideo(_videoPath: string, _query?: string, _title?: string, _extra?: object) {
+		if (this.isTouTiao()) {
+			return Toutiao.shareVideo(_videoPath, _query, _title, _extra);
+		} else {
+			return new Promise((resolve, reject) => {
+				reject();
+			});
 		}
 	}
 	////////////////////////////
