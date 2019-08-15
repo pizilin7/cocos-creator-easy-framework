@@ -211,18 +211,13 @@ class channelMgr {
 			console.log('头条视频');
 			return Toutiao.showRewardVideoAd();
 		} else {
-			return this.showRewardVideoAdOfDevelp();
+			let isSuccess = true;
+			AudioMgr.resume();
+			return this.developPromise(isSuccess);
 		}
 		console.log('观看视频');
 	}
 
-	private showRewardVideoAdOfDevelp() {
-		return new Promise((resolve, reject) => {
-			AudioMgr.resume();
-			let isComplete = true;
-			resolve(isComplete);
-		});
-	}
 	////////////////////////////
 	// 插屏广告
 	///////////////////////////
@@ -267,9 +262,17 @@ class channelMgr {
 	////////////////////////////
 	// 录制视频（头条系）
 	///////////////////////////
+	/**
+	 * @description 开始录屏。可以通过 onStart 接口监听录屏开始事件
+	 * @param _duration 录屏的时长，单位 s，必须大于3s，最大值 120（2 分钟）
+	 * @param callback
+	 */
 	public recordScreenStart(_duration: number, callback?: Function) {
 		if (this.isTouTiao()) {
-			Toutiao.recordScreenStart(_duration, callback);
+			Toutiao.startRecordScreen(_duration, callback);
+		} else {
+			let isSuccess = false;
+			return this.developPromise(isSuccess);
 		}
 	}
 
@@ -278,19 +281,28 @@ class channelMgr {
 	 */
 	public recordScreenPause(callback?: Function) {
 		if (this.isTouTiao()) {
-			Toutiao.recordScreenPause(callback);
+			Toutiao.pauseRecordScreen(callback);
+		} else {
+			let isSuccess = false;
+			return this.developPromise(isSuccess);
 		}
 	}
 
 	public recordScreenResume(callback?: Function) {
 		if (this.isTouTiao()) {
-			Toutiao.recordScreenResume(callback);
+			Toutiao.resumeRecordScreen(callback);
+		} else {
+			let isSuccess = false;
+			return this.developPromise(isSuccess);
 		}
 	}
 
 	public recordScreenStop(callback?: Function) {
 		if (this.isTouTiao()) {
-			Toutiao.recordScreenStop(callback);
+			Toutiao.stopRecordScreen(callback);
+		}else {
+			let isSuccess = false;
+			return this.developPromise(isSuccess);
 		}
 	}
 
@@ -299,15 +311,14 @@ class channelMgr {
 	 * @param _videoPath 要转发的视频地址
 	 * @param _query 查询字符串，必须是 key1=val1&key2=val2 的格式。从这条转发消息进入后，可通过 tt.getLaunchOptionSync() 或 tt.onShow() 获取启动参数中的 query。分享挑战视频时有效
 	 * @param _title 要转发的视频描述，分享挑战视频时有效
-	 * @param _extra 创建挑战视频时必填的配置
+	 * @param _createChallenge 为true时，指定分享的为挑战视频 (仅头条支持), 默认为false
 	 */
-	public shareVideo(_videoPath: string, _query?: string, _title?: string, _extra?: object) {
+	public shareVideo(_videoPath: string, _query?: string, _title?: string, _createChallenge?: boolean) {
 		if (this.isTouTiao()) {
-			return Toutiao.shareVideo(_videoPath, _query, _title, _extra);
+			return Toutiao.shareVideo(_videoPath, _query, _title, _createChallenge);
 		} else {
-			return new Promise((resolve, reject) => {
-				reject();
-			});
+			let isSuccess = true;
+			return this.developPromise(isSuccess);
 		}
 	}
 	////////////////////////////
@@ -367,6 +378,16 @@ class channelMgr {
 
 	public isDevelop() {
 		return this._channel === CHANNELTYPE.DEVELOP;
+	}
+
+	private developPromise(isSuccess: boolean) {
+		return new Promise((resolve, reject) => {
+			if (isSuccess) {
+				reject();
+			} else {
+				reject();
+			}
+		});
 	}
 }
 

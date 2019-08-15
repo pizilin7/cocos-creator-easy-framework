@@ -1,4 +1,4 @@
-
+// TODO: 录制视频成功，并且打印出视频所在位置，分享视频的时候显示shareVideo: fail parse share info fail; 把功能移植到特工上面是可以分享的，不知道是不是录制内容问题
 class toutiao {
 	////////////////////////////
 	// 类成员
@@ -247,7 +247,6 @@ class toutiao {
 			console.log('=====> @framework, 当前客户端版本过低，无法使用奖励视频功能，请升级到最新客户端版本后重试');
 			return;
 		}
-		console.log('3333333333');
 		if (this.rewardedVideoAd) {
 			return;
 		}
@@ -303,15 +302,20 @@ class toutiao {
 	 * @param _videoPath 要转发的视频地址
 	 * @param _query 查询字符串，必须是 key1=val1&key2=val2 的格式。从这条转发消息进入后，可通过 tt.getLaunchOptionSync() 或 tt.onShow() 获取启动参数中的 query。分享挑战视频时有效
 	 * @param _title 要转发的视频描述，分享挑战视频时有效
-	 * @param _extra 创建挑战视频时必填的配置
+	 * @param _createChallenge 为true时，指定分享的为挑战视频 (仅头条支持), 默认为false
 	 */
-	public shareVideo(_videoPath: string, _query?: string, _title?: string, _extra?: object){
+
+	public shareVideo(_videoPath: string, _query?: string, _title?: string, _createChallenge?: boolean) {
 		return new Promise((resolve, reject) => {
+			console.log('_videoPath: ', _videoPath);
+			console.log('_title: ', _title);
 			tt.shareVideo({
 				videoPath: _videoPath,
 				query: _query,
 				title: _title,
-				extra: _extra,
+				extra: {
+					createChallenge: false
+				},
 				success: () => {
 					resolve();
 				},
@@ -379,9 +383,9 @@ class toutiao {
 
 	/**
 	 * @description 开始录屏
-	 * @param _duration
+	 * @param _duration 录屏的时长，单位 s，必须大于3s，最大值 120（2 分钟）
 	 */
-	public recordScreenStart(_duration: number, callback?: Function) {
+	public startRecordScreen(_duration: number, callback?: Function) {
 		this.startListener = callback;
 		this.GameRecorderManager.start({
 			duration: _duration
@@ -391,25 +395,29 @@ class toutiao {
 	/**
 	 * @description 暂停录屏
 	 */
-	public recordScreenPause(callback?: Function) {
+	public pauseRecordScreen(callback?: Function) {
 		this.pauseListener = callback;
 		this.GameRecorderManager.pause();
 	}
 
-	public recordScreenRecordClip() {
+	public recordClipRecordScreen() {
 
 	}
 
-	public recordScreenClipVideo() {
+	public clipVideoRecordScreen() {
 
 	}
 
-	public recordScreenResume(callback?: Function) {
+	public resumeRecordScreen(callback?: Function) {
 		this.resumeListener = callback;
 		this.GameRecorderManager.resume();
 	}
 
-	public recordScreenStop(callback?: Function) {
+	/**
+	 * @description 暂停录屏
+	 * @param callback
+	 */
+	public stopRecordScreen(callback?: Function) {
 		this.stopListener = callback;
 		this.GameRecorderManager.stop();
 	}
