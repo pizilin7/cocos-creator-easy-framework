@@ -1,5 +1,5 @@
 /**
- * @description 玩家数据管理
+ * @description 路由管理
  */
 import { NetworkMgr } from '../network/networkMgr';
 
@@ -8,7 +8,7 @@ export class Message {
 	// 接口
 	///////////////////////////
 	/**
-	 * @description 登录
+	 * @description 默认登录
 	 * @param {Object} data
 	 * @param {Function} cb
 	 */

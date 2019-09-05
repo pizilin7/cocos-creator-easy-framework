@@ -72,7 +72,7 @@ class toutiao {
 					loginData.anonymousCode = res.anonymousCode;
 					if (res.isLogin) {
 						this.getUserInfo()
-							.then((data: {userInfo: object; rawData: string; signature?: string; encryptedData?: string; iv?: string}) => {
+							.then((data: {userInfo: any; rawData: string; signature?: string; encryptedData?: string; iv?: string}) => {
 								loginData.name = data.userInfo.nickName;
 								loginData.photo = data.userInfo.avatarUrl;
 								resolve(loginData);

@@ -8,7 +8,7 @@ class userCenter {
 	public static readonly _instance = new userCenter();
 	/** 玩家id */
 	private _id: number;
-	/** 玩家唯一标识: 出登录外，每一条协议的head.uid 都是改值 */
+	/** 玩家唯一标识: 除登录外，每一条协议的head.uid 都是该值 */
 	private _openid: string;
 	/** 玩家昵称 */
 	private _nickname: string;
@@ -27,10 +27,18 @@ class userCenter {
 	////////////////////////////
 	// 接口
 	///////////////////////////
+	/**
+	 * @description 初始化玩家数据
+	 * @param data 服务端登录数据
+	 */
 	public initUserInfo(data: any) {
 		this._id = data.id;
 		this._openid = data.openid;
 	}
+	/**
+	 * @description 处理服务http协议返回的头部信息
+	 * @param head
+	 */
 	public dealHead(head: any) {
 
 	}

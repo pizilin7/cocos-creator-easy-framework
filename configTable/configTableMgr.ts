@@ -34,19 +34,19 @@ class configTableMgr {
 		});
 	}
 
-	/**
-	 * @description 获取json文件
-	 * @param jsonName
-	 */
-	public getConfigTableItem(jsonName: string) {
-		let item = this.configTableMap[jsonName];
-		if (item) {
-			return item;
-		} else {
-			console.error(`=====> @framework, 获取配置表文件失败, 文件:${jsonName}.json 不存在`);
-			return null;
-		}
+/**
+ * @description 获取json文件
+ * @param jsonName json文件名称
+ */
+public getConfigTableItem(jsonName: string) {
+	let item = this.configTableMap[jsonName];
+	if (item) {
+		return item;
+	} else {
+		console.error(`=====> @framework, 获取配置表文件失败, 文件:${jsonName}.json 不存在`);
+		return null;
 	}
+}
 }
 
 export const ConfigTableMgr = configTableMgr._instance;

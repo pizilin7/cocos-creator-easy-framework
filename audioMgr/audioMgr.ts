@@ -9,6 +9,7 @@ cc.game.on(cc.game.EVENT_HIDE, () => {
 cc.game.on(cc.game.EVENT_SHOW, () => {
 	AudioMgr.resume();
 });
+
 class audio {
 	////////////////////////////
 	// 类成员
@@ -69,7 +70,7 @@ class audio {
 
 	/**
 	 * @description 播放音乐（默认循环）
-	 * @param {string} fileName
+	 * @param {string} fileName 播放的音效资源名称
 	 */
 	public playMusic(fileName: string) {
 		let audioClicp = this.isCanPlayAudio(fileName);
@@ -80,7 +81,7 @@ class audio {
 
 	/**
 	 * @description 播放音效
-	 * @param {string} fileName
+	 * @param {string} fileName 播放的音效资源名称
 	 */
 	public playEffect(fileName: string) {
 		let audioClip = this.isCanPlayAudio(fileName);

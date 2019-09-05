@@ -177,6 +177,7 @@ class networkMgr {
 			this.deleteMessageListItem(mid);
 		}
 		// 重启游戏
+		// tslint:disable-next-line: prefer-for-of
 		for (let index = 0; index < this._errorRestartGameCode.length; index ++) {
 			let errorCode = this._errorRestartGameCode[index];
 			if (code === errorCode) {
@@ -188,6 +189,7 @@ class networkMgr {
 	}
 
 	private checkNextMessage() {
+		// tslint:disable-next-line: forin
 		for (let key in this.messageList) {
 			let message = this.messageList[key];
 			if (message.sendNum === 0) {
@@ -285,6 +287,7 @@ class networkMgr {
 	 */
 	private checkPackage() {
 		if (Object.keys(this.messageList).length !== 0) {
+			// tslint:disable-next-line: forin
 			for (let key in this.messageList) {
 				let message = this.messageList[key];
 				let time = Date.now();

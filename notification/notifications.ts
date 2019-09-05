@@ -84,6 +84,7 @@ export class notifications {
 	 * @param target
 	 */
 	public offTarget(target: Object) {
+		// tslint:disable-next-line: forin
 		for (let type in this._eventMap) {
 			if (this._eventMap.hasOwnProperty(type)) {
 				let eventList: Array<any> = this._eventMap[type];
