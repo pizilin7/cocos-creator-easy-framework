@@ -1057,20 +1057,6 @@ declare function requestAnimationFrame(callback: () => void): number;
 
 declare namespace wx {
 	namespace types {
-		type envVersion = 'develop' | 'trial' | 'release';
-		/**
-		 * 打开另一个小程序
-		 */
-		interface MiniProgram {
-			appId: string;
-			path?: string;
-			extraData?: object;
-			envVersion?: envVersion;
-			success?: () => void;
-			fail?: () => void;
-			complete?: () => void;
-		}
-
 		interface Callbacks {
 			success?: () => void;
 			fail?: () => void;
@@ -1488,7 +1474,6 @@ declare namespace wx {
 
 		type NetworkType = 'wifi' | '2g' | '3g' | '4g' | 'unknown' | 'none';
 
-
 		type RequestMethod = 'GET' | 'HEAD' | 'POST' | 'PUT' | 'DELETE' | 'TRACE' | 'CONNECT';
 
 		interface RequestParams {
@@ -1734,10 +1719,6 @@ declare namespace wx {
 			 * 查询字符串，必须是 key1=val1&key2=val2 的格式。从这条转发消息进入后，可通过 wx.getLaunchOptionsSync() 或 wx.onShow 获取启动参数中的 query。
 			 */
 			query?: string;
-			/**
-			 * 审核通过的图片 ID
-			 * */
-			imageUrlId?: string;
 		}
 
 		interface AccelerometerParams {
@@ -1761,19 +1742,19 @@ declare namespace wx {
 			/**
 			 * banner 广告组件的宽度。最小 300，最大至 屏幕宽度（屏幕宽度可以通过 wx.getSystemInfoSync() 获取）。
 			 */
-			width?: number;
+			width: number;
 			/**
 			 * banner 广告组件的高度
 			 */
-			height?: number;
+			height: number;
 			/**
 			 * banner 广告组件经过缩放后真实的宽度
 			 */
-			realWidth?: number;
+			realWidth: number;
 			/**
 			 * banner 广告组件经过缩放后真实的高度
 			 */
-			realHeight?: number;
+			realHeight: number;
 		}
 	}
 
@@ -1823,13 +1804,11 @@ declare namespace wx {
 
 	function offShow(cb: (res: { scene: string; query: any; shareTicket: string }) => void): void;
 
-
 	// --系统信息
 	function getSystemInfo(cb: types.CallbacksWithType<types.SystemInfo>): void;
 
 	function getSystemInfoSync(): types.SystemInfo;
 
-	function navigateToMiniProgram(param: types.MiniProgram);
 	/**
 	 * 监听音频中断结束，在收到 onAudioInterruptionBegin 事件之后，小程序内所有音频会暂停，收到此事件之后才可再次播放成功
 	 */
@@ -2340,15 +2319,14 @@ declare namespace wx {
 	 * 创建游戏圈按钮。游戏圈按钮被点击后会跳转到小游戏的游戏圈。更多关于游戏圈的信息见 游戏圈使用指南
 	 */
 	function createGameClubButton(param: {
-		type?: types.ButtonType;
+		type: types.ButtonType;
 		text?: string;
 		image?: string;
 		style?: types.ButtonStyle;
 		/**
 		 * 游戏圈按钮的图标，仅当 object.type 参数为 image 时有效
-		 * types.GameClubButtonIcon
 		 */
-		icon?: string;
+		icon?: types.GameClubButtonIcon;
 	}): GameClubButton;
 
 	// --意见反馈
@@ -2959,10 +2937,6 @@ declare namespace wx {
 	 */
 	function createBannerAd(param: {
 		/**
-		 * 广告自动刷新的间隔时间，单位为秒，参数值必须大于等于30（该参数不传入时 Banner 广告不会自动刷新）
-		 */
-		adIntervals: number;
-		/**
 		 * 广告单元 id
 		 */
 		adUnitId: string;
@@ -2982,16 +2956,6 @@ declare namespace wx {
 		adUnitId: string;
 	}): RewardedVideoAd;
 
-	/**
-	 * 创建插屏广告组件。请通过 wx.getSystemInfoSync() 返回对象的 SDKVersion 判断基础库版本号后再使用该 API。每次调用该方法创建插屏广告都会返回一个全新的实例（小程序端的插屏广告实例不允许跨页面使用）
-	 * @param param
-	 */
-	function createInterstitialAd(param : {
-		/**
-		 * 广告单元 id
-		 */
-		adUnitId: string;
-	}): RewardedVideoAd;
 	// --虚拟支付
 	/**
 	 * 发起米大师支付
